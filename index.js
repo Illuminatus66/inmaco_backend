@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/connect_db";
-import authRoutes from "./routes/authRoutes";
-import invoiceRoutes from "./routes/invoiceRoutes";
+import connectDB from "./config/connect_db.js";
+import authRoutes from "./routes/authRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
 
 dotenv.config();
 connectDB();

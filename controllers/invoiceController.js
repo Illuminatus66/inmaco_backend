@@ -1,4 +1,4 @@
-import Invoice from "../models/Invoice";
+import Invoice from "../models/Invoice.js";
 
 const getFinancialYear = (date) => {
   const year = date.getFullYear();
