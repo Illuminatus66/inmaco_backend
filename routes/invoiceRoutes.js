@@ -14,6 +14,6 @@ router.get("/all", getInvoices, auth);
 router.post("/create", createInvoice, auth);
 router.put("/update/:invoiceNumber", updateInvoice, auth);
 router.delete("/delete/:invoiceNumber", deleteInvoice, auth);
-router.get("/filter", filterInvoices, auth);
+router.patch("/filter", filterInvoices, auth);
 
 export default router;
