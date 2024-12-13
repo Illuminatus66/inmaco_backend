@@ -1,12 +1,19 @@
 import Invoice from "../models/Invoice";
 
+const getFinancialYear = (date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const startYear = month >= 3 ? year : year - 1;
+  return startYear;
+};
+
 export const createInvoice = async (req, res) => {
   const { invoiceNumber, invoiceDate, invoiceAmount } = req.body;
 
   try {
     const date = new Date(invoiceDate);
-    const year = date.getFullYear();
-    const formattedInvoiceNumber = `${year}${invoiceNumber}`;
+    const startYear = getFinancialYear(date)
+    const formattedInvoiceNumber = `${startYear}${invoiceNumber}`;
 
     const existingInvoice = await Invoice.findOne({ invoiceNumber: formattedInvoiceNumber });
     if (existingInvoice) {
@@ -17,7 +24,7 @@ export const createInvoice = async (req, res) => {
       invoiceNumber: formattedInvoiceNumber,
       invoiceDate: date,
       invoiceAmount,
-      financialYear: year,
+      financialYear: startYear,
     });
     
     await invoice.save();
@@ -59,12 +66,12 @@ export const updateInvoice = async (req, res) => {
     }
 
     const date = new Date(invoiceDate);
-    const year = date.getFullYear();
+    const startYear = getFinancialYear(date)
 
     existingInvoice.invoiceNumber = invoiceNumber;
     existingInvoice.invoiceDate = date;
     existingInvoice.invoiceAmount = invoiceAmount;
-    existingInvoice.financialYear = year;
+    existingInvoice.financialYear = startYear;
 
     const updatedInvoice = await existingInvoice.save();
 
@@ -101,7 +108,7 @@ export const filterInvoices = async (req, res) => {
     }
 
     if (invoiceNumber && invoiceNumber.trim() !== "") {
-      query.invoiceNumber = invoiceNumber;
+      query.invoiceNumber = { $regex: new RegExp(`\\d{4}${invoiceNumber}$`) };
     }
 
     if (startDate || endDate) {
