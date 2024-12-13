@@ -1,25 +1,17 @@
 import Invoice from "../models/Invoice";
 
-const validateInvoiceNumber = async (invoiceNumber, year) => {
-  const existingInvoice = await Invoice.findOne({
-    invoiceNumber: { $regex: `^${year}` },
-    invoiceNumber: { $regex: `${invoiceNumber}$` },
-  });
-
-  if (existingInvoice) {
-    throw new Error("Duplicate invoice number");
-  }
-};
-
 export const createInvoice = async (req, res) => {
-  const { invoiceDate, invoiceNumber, invoiceAmount } = req.body;
+  const { invoiceNumber, invoiceDate, invoiceAmount } = req.body;
 
   try {
     const date = new Date(invoiceDate);
     const year = date.getFullYear();
     const formattedInvoiceNumber = `${year}${invoiceNumber}`;
 
-    await validateInvoiceNumber(invoiceNumber, year);
+    const existingInvoice = await Invoice.findOne({ invoiceNumber: formattedInvoiceNumber });
+    if (existingInvoice) {
+      return res.status(400).json({ message: "Duplicate invoice number" });
+    }
 
     const invoice = new Invoice({
       invoiceNumber: formattedInvoiceNumber,
@@ -27,6 +19,7 @@ export const createInvoice = async (req, res) => {
       invoiceAmount,
       financialYear: year,
     });
+    
     await invoice.save();
 
     res.status(201).json(invoice);
@@ -48,23 +41,34 @@ export const getInvoices = async (req, res) => {
 };
 
 export const updateInvoice = async (req, res) => {
-  const { invoiceNumber } = req.params;
-  const { invoiceDate, invoiceAmount } = req.body;
+  const { originalInvoiceNumber } = req.params;
+  const { invoiceNumber, invoiceDate, invoiceAmount } = req.body;
 
   try {
-    const date = new Date(invoiceDate);
-    const year = date.getFullYear();
-    const invoice = await Invoice.findOneAndUpdate(
-      { invoiceNumber },
-      { invoiceDate, invoiceAmount, financialYear: year },
-      { new: true, runValidators: true }
-    );
 
-    if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found." });
+    const existingInvoice = await Invoice.findOne({ invoiceNumber: originalInvoiceNumber });
+    if (!existingInvoice) {
+      return res.status(404).json({ message: "Invoice not found" });
     }
 
-    res.json(invoice);
+    if (originalInvoiceNumber !== invoiceNumber) {
+      const conflictingInvoice = await Invoice.findOne({ invoiceNumber });
+      if (conflictingInvoice) {
+        return res.status(400).json({ message: "Invoice number already exists" });
+      }
+    }
+
+    const date = new Date(invoiceDate);
+    const year = date.getFullYear();
+
+    existingInvoice.invoiceNumber = invoiceNumber;
+    existingInvoice.invoiceDate = date;
+    existingInvoice.invoiceAmount = invoiceAmount;
+    existingInvoice.financialYear = year;
+
+    const updatedInvoice = await existingInvoice.save();
+
+    res.status(200).json(updatedInvoice);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -92,11 +96,11 @@ export const filterInvoices = async (req, res) => {
   try {
     const query = {};
 
-    if (financialYear) {
+    if (financialYear && financialYear.trim() !== "") {
       query.financialYear = financialYear;
     }
 
-    if (invoiceNumber) {
+    if (invoiceNumber && invoiceNumber.trim() !== "") {
       query.invoiceNumber = invoiceNumber;
     }
 
@@ -107,6 +111,7 @@ export const filterInvoices = async (req, res) => {
     }
 
     const invoices = await Invoice.find(query);
+
     res.json(invoices);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

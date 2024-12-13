@@ -10,6 +10,6 @@ const invoiceSchema = new Schema(
   { timestamps: true }
 );
 
-invoiceSchema.index({ financialYear: 1, invoiceNumber: 1 }, { unique: true });
+invoiceSchema.index({ invoiceNumber: 1 }, { unique: true });
 
 export default model("Invoice", invoiceSchema);
