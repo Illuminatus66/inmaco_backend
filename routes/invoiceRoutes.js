@@ -5,7 +5,7 @@ import {
   updateInvoice,
   deleteInvoice,
   filterInvoices,
-} from "../controllers/invoiceController";
+} from "../controllers/invoiceController.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
