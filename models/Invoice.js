@@ -2,10 +2,10 @@ import { Schema, model } from "mongoose";
 
 const invoiceSchema = new Schema(
   {
-    invoiceNumber: { type: String, required: true },
+    invoiceNumber: { type: Number, required: true },
     invoiceDate: { type: Date, required: true },
     invoiceAmount: { type: Number, required: true },
-    financialYear: { type: String, required: true },
+    financialYear: { type: Number, required: true },
   },
   { timestamps: true }
 );

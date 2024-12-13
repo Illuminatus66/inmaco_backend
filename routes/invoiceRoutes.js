@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/all", getInvoices, auth);
 router.post("/create", createInvoice, auth);
-router.patch("/update/:invoiceNumber", updateInvoice, auth);
+router.patch("/update/:originalInvoiceNumber", updateInvoice, auth);
 router.delete("/delete/:invoiceNumber", deleteInvoice, auth);
 router.patch("/filter", filterInvoices, auth);
 
