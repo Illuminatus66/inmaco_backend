@@ -76,7 +76,8 @@ root
    - Add the following variables:
      ```env
      PORT=3000
-     MONGODB_URI=<Your MongoDB Atlas URI>
+     CONNECTION_URL=<Your MongoDB Atlas URI>
+     JWT_SECRET=<Used to sign tokens verifying the origin of requests>
      ```
 
 4. Start the server:
@@ -89,8 +90,6 @@ root
 
 ## API Endpoints
 
-### Base URL: `/api`
-
 #### 1. **Create an Invoice**
    - **Endpoint:** `POST api/invoices/create`
    - **Request Body:**
@@ -101,16 +100,9 @@ root
        "amount": 5000
      }
      ```
-   - **Response:**
-     ```json
-     {
-       "message": "Invoice created successfully",
-       "invoice": { ... }
-     }
-     ```
 
 #### 2. **Update an Invoice**
-   - **Endpoint:** `PUT api/invoices/update/:invoiceNumber`
+   - **Endpoint:** `PATCH api/invoices/update/:invoiceNumber`
    - **Request Body:**
      ```json
      {
@@ -120,7 +112,7 @@ root
      ```
 
 #### 3. **Delete an Invoice**
-   - **Endpoint:** `DELETE /invoices/delete/:invoiceNumber`
+   - **Endpoint:** `DELETE api/invoices/delete/:invoiceNumber`
 
 #### 4. **Filter/Search Invoices**
    - **Endpoint:** `GET api/invoices/filter`

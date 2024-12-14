@@ -9,7 +9,7 @@ describe('Invoice API Endpoints', () => {
     // Test data
     const testInvoice = {
         invoiceNumber: "2100",
-        invoiceDate: "2024-01-15",
+        invoiceDate: "2024-07-15",
         amount: 5000
     };
 
