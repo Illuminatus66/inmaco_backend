@@ -98,17 +98,22 @@ export const deleteInvoice = async (req, res) => {
 };
 
 export const filterInvoices = async (req, res) => {
+  if (!Object.keys(req.query).length) {
+    return res.status(400).json({ message: "No filter criteria provided" });
+  }
+  
   const { financialYear, invoiceNumber, startDate, endDate } = req.query;
 
   try {
     const query = {};
 
     if (financialYear && financialYear.trim() !== "") {
-      query.financialYear = financialYear;
+      query.financialYear = financialYear.trim();;
     }
 
     if (invoiceNumber && invoiceNumber.trim() !== "") {
-      query.invoiceNumber = { $regex: new RegExp(`\\d{4}${invoiceNumber}$`) };
+      const invoiceStr = String(invoiceNumber).trim();
+      query.invoiceNumber = { $regex: new RegExp(`\\d{4}${invoiceStr}$`) };
     }
 
     if (startDate || endDate) {
